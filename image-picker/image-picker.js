@@ -34,6 +34,7 @@
     default_options = {
       hide_select: true,
       show_label: false,
+      is_video: false,
       initialized: void 0,
       changed: void 0,
       clicked: void 0,
@@ -216,7 +217,12 @@
       this.clicked = __bind(this.clicked, this);
 
       this.option = jQuery(option_element);
-      this.create_node();
+
+      if (this.opts.is_video) {
+        this.create_video_node();
+      } else {
+        this.create_node();
+      }
     }
 
     ImagePickerOption.prototype.destroy = function() {
@@ -287,6 +293,46 @@
         thumbnail.append(jQuery("<p/>").html(this.label()));
       }
       this.node.append(thumbnail);
+      return this.node;
+    };
+
+    ImagePickerOption.prototype.create_video_node = function() {
+      var image, mp4_source, webm_source, thumbnail, label;
+      this.node = jQuery("<li/>");
+      
+      video = jQuery("<video class='image_picker_video'/>");
+      
+      mp4_source = jQuery('<source type="video/mp4" />');
+      webm_source = jQuery('<source type="video/webm" />');
+
+      mp4_source.attr("src", this.option.data("mp4-src"));
+      webm_source.attr("src", this.option.data("webm-src"));
+
+      video.append(mp4_source);
+      video.append(webm_source);
+
+      thumbnail = jQuery("<div class='thumbnail'>");
+      
+      thumbnail.click({
+        option: this
+      }, function(event) {
+        return event.data.option.clicked();
+      });
+      
+      thumbnail.append(video);
+      
+      label = '';
+      
+      if (this.opts.show_label) {
+        label = this.label();
+      }
+
+      label += "<i class='fa fa-play pull-right'></i>"
+
+	  thumbnail.append(jQuery("<p class='video-label' />").html(label));
+      
+      this.node.append(thumbnail);
+      
       return this.node;
     };
 
